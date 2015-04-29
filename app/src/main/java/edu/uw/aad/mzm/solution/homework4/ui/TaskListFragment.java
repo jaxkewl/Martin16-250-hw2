@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.uw.aad.mzm.solution.homework4.R;
@@ -36,14 +34,27 @@ public class TaskListFragment extends ListFragment {
     private ArrayAdapter<Task> mTaskArrayAdapter;
     private List<Task> tasks;
 
+    private Callbacks mCallbacks = sDummyCallbacks;
 
     private void init(View rootView) {
         // Get task list data from DB
         mTaskDbHelper = new TaskDbHelper(getActivity());
         tasks = mTaskDbHelper.getTasks();
 
+        setListAdapter(new ArrayAdapter<Task>(
+                getActivity(),
+                android.R.layout.simple_list_item_activated_1,
+                android.R.id.text1,
+                tasks));
+    }
+
+/*    private void initOld(View rootView) {
+        // Get task list data from DB
+        mTaskDbHelper = new TaskDbHelper(getActivity());
+        tasks = mTaskDbHelper.getTasks();
+
         // Set up UI ListView
-        mListViewTasks = (ListView) rootView.findViewById(R.id.listViewTasks);
+        mListViewTasks = (ListView) rootView.findViewById(R.id.listView);
         mTaskArrayAdapter = new ArrayAdapter<Task>(getActivity(),  // context
                 android.R.layout.simple_list_item_multiple_choice,                 // UI layout for the list item, multiple choices
 //                android.R.layout.simple_list_item_single_choice,                     // UI layout for the list item, single choice
@@ -51,7 +62,7 @@ public class TaskListFragment extends ListFragment {
         mListViewTasks.setAdapter(mTaskArrayAdapter);
 //        mListViewTasks.setChoiceMode(ListView.CHOICE_MODE_SINGLE);                // Use this for single choice
         mListViewTasks.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-    }
+    }*/
 
 
     @Nullable
@@ -78,10 +89,10 @@ public class TaskListFragment extends ListFragment {
     private void refreshUI() {
 
         tasks = mTaskDbHelper.getTasks();           // Get all the tasks from db
-        mTaskArrayAdapter.clear();                  // Clear the ArrayAdapter
-        mTaskArrayAdapter.addAll(tasks);            // Add all tasks
-        mListViewTasks.clearChoices();              // Clear all selections
-        mTaskArrayAdapter.notifyDataSetChanged();
+        //mTaskArrayAdapter.clear();                  // Clear the ArrayAdapter
+        //mTaskArrayAdapter.addAll(tasks);            // Add all tasks
+        //mListViewTasks.clearChoices();              // Clear all selections
+        //mTaskArrayAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -106,7 +117,7 @@ public class TaskListFragment extends ListFragment {
                 deleteSingleTask(position, task.getId());*/
 
                 // Delete multiple tasks
-                ArrayList<Integer> ids = new ArrayList<Integer>();
+/*                ArrayList<Integer> ids = new ArrayList<Integer>();
                 SparseBooleanArray checkedItems = mListViewTasks.getCheckedItemPositions();
                 if (checkedItems.size() > 0) {
                     for (int i = 0; i < checkedItems.size(); i++) {
@@ -115,7 +126,7 @@ public class TaskListFragment extends ListFragment {
                         ids.add((int) task.getId());
                     }
                     mTaskDbHelper.deleteTasks(ids);
-                }
+                }*/
                 refreshUI();
                 break;
         }
@@ -162,7 +173,15 @@ public class TaskListFragment extends ListFragment {
 
     @Override
     public void onAttach(Activity activity) {
+
         super.onAttach(activity);
+
+        // Activities containing this fragment must implement its callbacks.
+        if (!(activity instanceof Callbacks)) {
+            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+        }
+
+        mCallbacks = (Callbacks) activity;
     }
 
     @Override
@@ -174,5 +193,22 @@ public class TaskListFragment extends ListFragment {
     implement the methods of this interface*/
     public interface Callbacks {
         void onTaskListSelected(String id);
+    }
+
+    private static Callbacks sDummyCallbacks = new Callbacks() {
+        @Override
+        public void onTaskListSelected(String id) {
+
+        }
+    };
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        Log.d(TAG, "onListItemClick: " + position);
+        super.onListItemClick(l, v, position, id);
+
+        // Notify the active callbacks interface (the activity, if the
+        // fragment is attached to one) that an item has been selected.
+        mCallbacks.onTaskListSelected(Integer.toString(position));
     }
 }

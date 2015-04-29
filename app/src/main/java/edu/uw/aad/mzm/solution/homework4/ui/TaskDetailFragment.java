@@ -50,20 +50,30 @@ public class TaskDetailFragment extends Fragment {
         mDbHelper = new TaskDbHelper(getActivity());
         mTasks = mDbHelper.getTasks();
 
-        if (getArguments().containsKey(TASK_ID)) {
-            mTaskID = getArguments().getString(TASK_ID);
+        //UUID uTaskID = (UUID)getActivity().getIntent().getSerializableExtra(TASK_ID);
+
+        mTaskID = (String)getActivity().getIntent().getSerializableExtra(TASK_ID);
+
+        //if (getArguments().containsKey(TASK_ID)) {
+        //    mTaskID = getArguments().getString(TASK_ID);
 
             int taskID = Integer.parseInt(mTaskID);
             mTask = mTasks.get(taskID);
             Log.d(TAG, "found task: " + mTask);
-        }
+        //}
     }
 
     //to make the code easier to read, do all the initial setup in here
     //i.e. setting up widgets
     private void init(View rootView) {
+        Log.d(TAG, "init() called, setting up view widgets...");
         mTextViewTaskDescr = (TextView) rootView.findViewById(R.id.fragment_detail_task_descr);
         mTextViewTaskName = (TextView) rootView.findViewById(R.id.fragment_detail_task_name);
+
+        if (null != mTask) {
+            mTextViewTaskName.setText(mTask.getName());
+            mTextViewTaskDescr.setText(mTask.getDesc());
+        }
     }
 
 

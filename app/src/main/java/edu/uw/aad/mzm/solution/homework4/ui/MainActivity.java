@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
 
     private boolean mTwoPaneMode = false;
 
-    private void oldWay() {
+    /*private void oldWay() {
         // Get task list data from DB
         mTaskDbHelper = new TaskDbHelper(this);
         tasks = mTaskDbHelper.getTasks();
@@ -57,7 +57,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
 //        mListViewTasks.setChoiceMode(ListView.CHOICE_MODE_SINGLE);                // Use this for single choice
         mListViewTasks.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
     }
-
+*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +104,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
 
     @Override
     public void onTaskListSelected(String id) {
+        Log.d(TAG,"onTaskListSelected: " + id);
         //GOTCHA: implement this method that was defined in the TaskListFragment interface.
         //when an item from the task list is selected, this method is how it is handled.
 
@@ -120,7 +121,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
 
             Log.d(TAG, "Single Pane Mode...");
 
-            Intent intent = new Intent(MainActivity.this, TaskDetailFragment.class);
+            Intent intent = new Intent(MainActivity.this, TaskDetail.class);
             intent.putExtra(TaskDetailFragment.TASK_ID, id);
             startActivity(intent);
         }

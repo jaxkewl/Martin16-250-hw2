@@ -23,8 +23,12 @@
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
-            android:name=".ui.MainActivity2Activity"
-            android:label="@string/title_activity_main_activity2" >
+            android:name=".ui.TaskDetail"
+            android:label="@string/title_activity_task_detail"
+            android:parentActivityName=".ui.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.uw.aad.mzm.solution.homework4.ui.MainActivity" />
         </activity>
     </application>
 
