@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import edu.uw.aad.mzm.solution.homework4.R;
 
@@ -19,9 +20,13 @@ public class TaskDetail extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_detail);
 
-        Log.d(TAG,"onCreate...");
+        Log.d(TAG, "onCreate...");
 
 
+        Bundle bundle = getIntent().getExtras();
+        String chosenTaskID = bundle.getString(TaskDetailFragment.TASK_ID);
+
+        Toast.makeText(this, "Selected Task: " + chosenTaskID, Toast.LENGTH_SHORT).show();
 
         FragmentManager fm = getFragmentManager();
         Fragment taskDetailFragment = fm.findFragmentById(R.id.task_detail_fragment_container);

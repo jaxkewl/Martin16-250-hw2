@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -38,6 +39,17 @@ public class TaskDetailFragment extends Fragment {
     }
 
 
+    /*this method handles getting the arguments when the "extras are attached to the fragments"*/
+    private int getTaskId() {
+
+        if (getArguments().containsKey(TASK_ID)) {
+            String stringTaskID = getArguments().getString(TASK_ID);
+            return Integer.parseInt(stringTaskID);
+        }
+
+        return -1;
+    }
+
     //use this method to get the bundle and convert that to a task
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,21 +64,29 @@ public class TaskDetailFragment extends Fragment {
 
         //UUID uTaskID = (UUID)getActivity().getIntent().getSerializableExtra(TASK_ID);
 
-        mTaskID = (String)getActivity().getIntent().getSerializableExtra(TASK_ID);
+        mTaskID = getActivity().getIntent().getStringExtra(TASK_ID);
+        Bundle bundle = getArguments();
 
         //if (getArguments().containsKey(TASK_ID)) {
         //    mTaskID = getArguments().getString(TASK_ID);
-
+        if (null != mTaskID) {
             int taskID = Integer.parseInt(mTaskID);
             mTask = mTasks.get(taskID);
-            Log.d(TAG, "found task: " + mTask);
+        } else if (getArguments().containsKey(TASK_ID)) {
+            mTaskID = getArguments().getString(TASK_ID);
+            mTask = mTasks.get(Integer.parseInt(mTaskID));
+        }
+        Log.d(TAG, "found task: " + mTask);
         //}
+
+        Toast.makeText(getActivity(),"Retrieved from Bundle or Args: " + mTask,Toast.LENGTH_SHORT).show();
+
     }
 
     //to make the code easier to read, do all the initial setup in here
     //i.e. setting up widgets
     private void init(View rootView) {
-        Log.d(TAG, "init() called, setting up view widgets...");
+        Log.d(TAG, "init() called, setting up view widgets with task: " + mTask);
         mTextViewTaskDescr = (TextView) rootView.findViewById(R.id.fragment_detail_task_descr);
         mTextViewTaskName = (TextView) rootView.findViewById(R.id.fragment_detail_task_name);
 

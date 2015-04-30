@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:orientation="horizontal"
+    android:showDividers="middle"
+    tools:context=".MainActivity">
+
+    <!--GOTCHA: The name of this task list fragment needs to be the same name as the
+    portrait task list fragment container.-->
+    <FrameLayout
+        android:layout_weight="1"
+        android:id="@+id/task_list_fragment_container"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"></FrameLayout>
+
+    <FrameLayout
+        android:layout_weight="2"
+        android:id="@+id/sw600_layout_task_detail"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"></FrameLayout>
+
+</LinearLayout>
