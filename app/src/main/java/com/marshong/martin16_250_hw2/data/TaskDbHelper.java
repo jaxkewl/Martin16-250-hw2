@@ -1,4 +1,4 @@
-package com.marshong.data;
+package com.marshong.martin16_250_hw2.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

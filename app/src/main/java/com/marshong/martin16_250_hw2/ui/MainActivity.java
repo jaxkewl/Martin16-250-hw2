@@ -1,8 +1,9 @@
-package com.marshong.ui;
+package com.marshong.martin16_250_hw2.ui;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -12,9 +13,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.marshong.R;
-import com.marshong.data.TaskDbHelper;
-import com.marshong.model.Task;
+import com.marshong.martin16_250_hw2.R;
+import com.marshong.martin16_250_hw2.data.TaskDbHelper;
+import com.marshong.martin16_250_hw2.data.TasksContract;
+import com.marshong.martin16_250_hw2.model.Task;
 
 import java.util.List;
 
@@ -154,6 +156,17 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
             //the way we are handling it for dual pane mode
             Intent intent = new Intent(MainActivity.this, TaskDetail.class);
             intent.putExtra(TaskDetailFragment.TASK_ID, id);
+
+
+            //Note: create a URI with the ID of which task was selected and pass it to the TaskDetail activity.
+            //      In the TaskDetail activity, we will retrieve the uri extra and create a bundle so it can be
+            //      set in the fragments argument. Just a different way of doing it like the way it's done in
+            //      dual pane mode above.
+            Uri uri = Uri.parse(TasksContract.Task.CONTENT_URI + "/" + id);
+            Log.d(TAG, "putting extra: " + uri);
+            intent.putExtra("uri", uri);
+
+
             startActivity(intent);
         }
     }
@@ -207,18 +220,18 @@ Split Pane
 
 
 Content Provider
-1. The ContentProvider must be registered in the manifest.
-1. All accessing of the database will be handled via a wrapper class called a Content Provider.
+1. The ContentProvider must be registered in the manifest. This name must match the name defined in the Contract.
+2. All accessing of the database will be handled via a wrapper class called a Content Provider.
     a. Content Resolver or Cursor Loader allows you to access data from a ContentProvider
     b. The ContentResolver does not directly invoke the ContentProviders query method directly.
        The CR's query method is invoked, which parses the URI, determines which CP to invoke, and
        then calls the CP's query method.
-2. Remove insert/queries/deletes from the DB Helper and move them into the ContentProvider Class.
-3. Create a class TaskProvider that extends ContentProvider. You will be forced to implement certain methods.
+3. Remove insert/queries/deletes from the DB Helper and move them into the ContentProvider Class.
+4. Create a class TaskProvider that extends ContentProvider. You will be forced to implement certain methods.
     a. onCreate, query, getType, insert, delete, update
-4. ContentProvider created in 3, holds a DBHelper field to be used.
-5. The CP will provide the uriMatcher which contains the URI needed to access the information.
-6. The DB Helper class should only have onCreate and onUpgrade methods.
+5. TaskProvider created in 4, holds a DBHelper field to be used.
+6. The CP will provide the uriMatcher which contains the URI needed to access the information.
+7. The DB Helper class should only have onCreate and onUpgrade methods.
 
 
 Cursor Loader

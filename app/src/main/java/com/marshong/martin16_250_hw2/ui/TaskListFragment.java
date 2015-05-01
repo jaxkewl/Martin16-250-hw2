@@ -1,4 +1,4 @@
-package com.marshong.ui;
+package com.marshong.martin16_250_hw2.ui;
 
 import android.app.Activity;
 import android.app.ListFragment;
@@ -21,10 +21,10 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import com.marshong.R;
-import com.marshong.data.TaskDbHelper;
-import com.marshong.data.TasksContract;
-import com.marshong.model.Task;
+import com.marshong.martin16_250_hw2.R;
+import com.marshong.martin16_250_hw2.data.TaskDbHelper;
+import com.marshong.martin16_250_hw2.data.TasksContract;
+import com.marshong.martin16_250_hw2.model.Task;
 
 import java.util.List;
 

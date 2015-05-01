@@ -1,7 +1,9 @@
-package com.marshong.ui;
+package com.marshong.martin16_250_hw2.ui;
 
 
 import android.app.Fragment;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,11 +12,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.marshong.R;
-import com.marshong.data.TaskDbHelper;
-import com.marshong.model.Task;
-
-import java.util.List;
+import com.marshong.martin16_250_hw2.R;
+import com.marshong.martin16_250_hw2.data.TasksContract;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,17 +28,23 @@ public class TaskDetailFragment extends Fragment {
     private TextView mTextViewTaskDescr;
 
     //the following fields are from the DB and the DB object type
-    private TaskDbHelper mDbHelper;
+/*    private TaskDbHelper mDbHelper;
     private List<Task> mTasks;
     private String mTaskID;
-    private Task mTask;
+    private Task mTask;*/
+
+
+    private Uri mUri;
+    private String version;
+    private String mTaskName;
+    private String mTaskDescr;
 
     public TaskDetailFragment() {
         // Required empty public constructor
     }
 
 
-    /*this method handles getting the arguments when the "extras are attached to the fragments"*/
+/*    *//*this method handles getting the arguments when the "extras are attached to the fragments"*//*
     private int getTaskId() {
 
         if (getArguments().containsKey(TASK_ID)) {
@@ -48,9 +53,44 @@ public class TaskDetailFragment extends Fragment {
         }
 
         return -1;
-    }
+    }*/
+
 
     //use this method to get the bundle and convert that to a task
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate called, setting up dbHelper...");
+
+        super.onCreate(savedInstanceState);
+
+        Bundle bundle = getArguments();
+        if (null != bundle) {
+            mUri = bundle.getParcelable("uri"); // get URI
+        }
+
+        Log.d(TAG,"Retrieved URI: " + mUri);
+
+        Cursor c = getActivity().getContentResolver().query(mUri,
+                TasksContract.Task.PROJECTION,
+                null,
+                null,
+                null);
+
+        if (c.moveToFirst()) {
+            mTaskName = c.getString(c.getColumnIndexOrThrow(TasksContract.Task.TASK_NAME));
+            mTaskDescr = c.getString(c.getColumnIndexOrThrow(TasksContract.Task.TASK_DESC));
+        }
+        //close the cursor
+        c.close();
+
+        Log.d(TAG, "found task: " + mTaskName + " " + mTaskDescr);
+        //}
+
+        Toast.makeText(getActivity(), "Retrieved from Bundle or Args: " + mTaskName, Toast.LENGTH_SHORT).show();
+
+    }
+
+/*    //use this method to get the bundle and convert that to a task
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate called, setting up dbHelper...");
@@ -81,18 +121,18 @@ public class TaskDetailFragment extends Fragment {
 
         Toast.makeText(getActivity(),"Retrieved from Bundle or Args: " + mTask,Toast.LENGTH_SHORT).show();
 
-    }
+    }*/
 
     //to make the code easier to read, do all the initial setup in here
     //i.e. setting up widgets
     private void init(View rootView) {
-        Log.d(TAG, "init() called, setting up view widgets with task: " + mTask);
+        Log.d(TAG, "init() called, setting up view widgets");
         mTextViewTaskDescr = (TextView) rootView.findViewById(R.id.fragment_detail_task_descr);
         mTextViewTaskName = (TextView) rootView.findViewById(R.id.fragment_detail_task_name);
 
-        if (null != mTask) {
-            mTextViewTaskName.setText(mTask.getName());
-            mTextViewTaskDescr.setText(mTask.getDesc());
+        if (null != mTaskName && null != mTaskDescr) {
+            mTextViewTaskName.setText(mTaskName);
+            mTextViewTaskDescr.setText(mTaskDescr);
         }
     }
 

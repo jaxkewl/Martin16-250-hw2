@@ -1,7 +1,8 @@
-package com.marshong.ui;
+package com.marshong.martin16_250_hw2.ui;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -9,7 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.marshong.R;
+import com.marshong.martin16_250_hw2.R;
 
 
 public class TaskDetail extends ActionBarActivity {
@@ -26,6 +27,7 @@ public class TaskDetail extends ActionBarActivity {
 
         Bundle bundle = getIntent().getExtras();
         String chosenTaskID = bundle.getString(TaskDetailFragment.TASK_ID);
+        Uri uri = getIntent().getExtras().getParcelable("uri");
 
         Toast.makeText(this, "Selected Task: " + chosenTaskID, Toast.LENGTH_SHORT).show();
 
@@ -33,6 +35,8 @@ public class TaskDetail extends ActionBarActivity {
         Fragment taskDetailFragment = fm.findFragmentById(R.id.task_detail_fragment_container);
         if (null == taskDetailFragment) {
             taskDetailFragment = new TaskDetailFragment();
+            bundle.putParcelable("uri", uri);
+            taskDetailFragment.setArguments(bundle);
             fm.beginTransaction().add(R.id.task_detail_fragment_container, taskDetailFragment).commit();
         }
 

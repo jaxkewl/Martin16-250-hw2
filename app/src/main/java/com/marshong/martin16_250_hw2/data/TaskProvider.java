@@ -1,4 +1,4 @@
-package com.marshong.data;
+package com.marshong.martin16_250_hw2.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -17,17 +17,21 @@ public class TaskProvider extends ContentProvider {
     private static final String TAG = TaskProvider.class.getSimpleName();
 
     private static final int VERSION = 100;
-    private static final int VERSION_ID = 200;
+    private static final int TASK_ID = 200;
 
     private static final UriMatcher sUriMatcher = createUriMatcher();
 
     private static UriMatcher createUriMatcher() {
 
-        Log.d(TAG, "creating URI Matcher using " + TasksContract.CONTENT_AUTHORITY + " " + TasksContract.PATH_VERSION);
+        Log.d(TAG, "creating URI Matcher using " + TasksContract.CONTENT_AUTHORITY + " " + TasksContract.PATH_TASK);
         final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = TasksContract.CONTENT_AUTHORITY;
-        uriMatcher.addURI(authority, TasksContract.PATH_VERSION, VERSION);
-        uriMatcher.addURI(authority, TasksContract.PATH_VERSION + "/#", VERSION_ID);
+
+
+        //Note: when a URI comes in for a query, the method will determine if the query is for a
+        //generic version or if its for a specific task_id. i.e. querying against the primary key.
+        uriMatcher.addURI(authority, TasksContract.PATH_TASK, VERSION);
+        uriMatcher.addURI(authority, TasksContract.PATH_TASK + "/#", TASK_ID);
 
         return uriMatcher;
     }
@@ -44,7 +48,7 @@ public class TaskProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Log.d(TAG, "Querying the DB...");
+        Log.d(TAG, "Querying the DB..." + uri.toString());
 
         // Use SQLiteQueryBuilder for querying db
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
@@ -58,13 +62,19 @@ public class TaskProvider extends ContentProvider {
         // Match Uri pattern
         int uriType = sUriMatcher.match(uri);
 
+        Log.d(TAG, "URI Type: " + uriType);
+
         switch (uriType) {
             case VERSION:
+                //is this URI for a generic query?
                 break;
-            case VERSION_ID:
+            case TASK_ID:
+                //does the URI match a specific pattern, and if so, we want to have a specific query
+                //against a primary key.
                 selection = TasksContract.Task.ID + " = ? ";
                 id = uri.getLastPathSegment();
                 selectionArgs = new String[]{id};
+                Log.d(TAG, "looking for ID: " + id);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -93,7 +103,7 @@ public class TaskProvider extends ContentProvider {
         switch ((sUriMatcher.match(uri))) {
             case VERSION:
                 return TasksContract.Task.CONTENT_TYPE;
-            case VERSION_ID:
+            case TASK_ID:
                 return TasksContract.Task.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);

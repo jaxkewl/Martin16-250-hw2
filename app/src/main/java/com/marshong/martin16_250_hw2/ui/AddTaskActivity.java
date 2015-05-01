@@ -1,4 +1,4 @@
-package com.marshong.ui;
+package com.marshong.martin16_250_hw2.ui;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.marshong.R;
+import com.marshong.martin16_250_hw2.R;
 
 
 public class AddTaskActivity extends ActionBarActivity {

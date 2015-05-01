@@ -1,4 +1,4 @@
-package com.marshong.model;
+package com.marshong.martin16_250_hw2.model;
 
 /**
  * Created by Margaret on 2/23/2015.
