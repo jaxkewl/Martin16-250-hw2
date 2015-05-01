@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="edu.uw.aad.mzm.solution.homework4.ui.TaskDetailFragment">
+    tools:context="com.marshong.ui.TaskDetailFragment">
 
     <TextView
         android:text="Task Details"

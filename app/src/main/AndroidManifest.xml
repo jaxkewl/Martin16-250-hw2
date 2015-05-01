@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="edu.uw.aad.mzm.solution.homework4" >
+    package="com.marshong" >
 
     <application
         android:allowBackup="true"
@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ui.MainActivity"
+            android:name="com.marshong.ui.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,19 +17,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.AddTaskActivity"
+            android:name="com.marshong.ui.AddTaskActivity"
             android:label="@string/title_activity_add_task"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName="com.marshong.ui.MainActivity"
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
-            android:name=".ui.TaskDetail"
+            android:name="com.marshong.ui.TaskDetail"
             android:label="@string/title_activity_task_detail"
-            android:parentActivityName=".ui.MainActivity" >
+            android:parentActivityName="com.marshong.ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.uw.aad.mzm.solution.homework4.ui.MainActivity" />
+                android:value="com.marshong.ui.MainActivity" />
         </activity>
+        <!--The path to the provider-->
+        <provider
+            android:name="com.marshong.data.TaskProvider"
+            android:authorities="com.marshong"
+            android:exported="false" />
     </application>
 
 </manifest>
