@@ -2,11 +2,13 @@ package com.marshong.martin16_250_hw2.ui;
 
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -39,6 +41,8 @@ public class TaskDetailFragment extends Fragment {
     private String mTaskName;
     private String mTaskDescr;
 
+    private String mId;
+
     public TaskDetailFragment() {
         // Required empty public constructor
     }
@@ -60,6 +64,7 @@ public class TaskDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate called, setting up dbHelper...");
+        setHasOptionsMenu(true);
 
         super.onCreate(savedInstanceState);
 
@@ -67,8 +72,10 @@ public class TaskDetailFragment extends Fragment {
         if (null != bundle) {
             mUri = bundle.getParcelable("uri"); // get URI
         }
+        mId = bundle.getString(TaskDetailFragment.TASK_ID);
+        Log.d(TAG, "Retrieved ID: " + mId);
 
-        Log.d(TAG,"Retrieved URI: " + mUri);
+        Log.d(TAG, "Retrieved URI: " + mUri);
 
         Cursor c = getActivity().getContentResolver().query(mUri,
                 TasksContract.Task.PROJECTION,
@@ -147,5 +154,37 @@ public class TaskDetailFragment extends Fragment {
         return rootView;
     }
 
+    private void deleteTask(String id) {
+        Log.d(TAG, "Deleting a task: " + id);
 
+        //Note: TaskProvider needs a URI and delete arguments. Similar to the DB Helper class we've used before.
+
+        //Second, get the URI to insert a task
+        String whereClause = TasksContract.Task._ID + "=" + id;
+        getActivity().getContentResolver().delete(TasksContract.Task.CONTENT_URI, whereClause, null);
+
+        //after deleting, go back to the Master List Page.
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        startActivity(intent);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected..." + item.getItemId());
+
+        switch (item.getItemId()) {
+
+            case R.id.action_delete:
+                //delete this task
+                deleteTask(mId);
+
+                Toast.makeText(getActivity(), "Task " + mTaskName + " deleted, ID:" + mId, Toast.LENGTH_SHORT).show();
+                break;
+
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
 }

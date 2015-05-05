@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">250-Homework2</string>
+    <string name="app_name">martin16-250-Hw2</string>
     <string name="add_task_instr">Please add a task:</string>
     <string name="action_add">Add</string>
     <string name="action_delete">Delete</string>
@@ -15,5 +15,6 @@
     <string name="task_name">Task Name:</string>
     <string name="task_descr">Task Description:</string>
     <string name="title_activity_task_detail">TaskDetail</string>
+    <string name="title_activity_delete_task">DeleteTaskActivity</string>
 
 </resources>

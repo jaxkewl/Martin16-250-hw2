@@ -12,9 +12,11 @@ import android.provider.BaseColumns;
 public class TasksContract {
 
     // Name of the Content Provider, use package name by convention so that it's unique on device
+    // kinda like domain name.
     public static final String CONTENT_AUTHORITY = "com.marshong.martin16_250_hw2";
 
-    // A path that points to the task table
+    // A path that points to the task table.
+    //Note: for multiple tables, you'll need another PATH, i.e. PATH_ANOTHERTABLE
     public static final String PATH_TASK = "task";
 
     // Construct the Base Content Uri
@@ -28,6 +30,7 @@ public class TasksContract {
     public static final class Task implements BaseColumns {
 
         // Content Uri = Content Authority + Path
+        //kinda like URL
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TASK).build();
 
         // Use MIME type prefix android.cursor.dir/ for returning multiple items

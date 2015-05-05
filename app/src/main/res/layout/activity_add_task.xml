@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,6 +6,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
     tools:context="com.marshong.martin16_250_hw2.ui.AddTaskActivity"
     android:gravity="center">
 
@@ -23,14 +24,23 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/textViewTaskInstr"
         android:hint="Task Name"
-        android:inputType="text"/>
+        android:background="@drawable/text_border2"
+        android:padding="5dp"
+        android:layout_marginBottom="10dp"
+        android:inputType="text"
+        android:gravity="center"
+        />
 
     <EditText
         android:id="@+id/editTextTaskDesc"
         android:layout_below="@id/editTextTaskName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Task description"
+        android:hint="Task description..."
+        android:background="@drawable/text_border2"
+        android:padding="5dp"
+        android:gravity="center"
+        android:lines="3"
         android:layout_marginBottom="16dp"/>
 
     <Button
@@ -41,4 +51,4 @@
         android:text="OK"
         android:layout_centerHorizontal="true"/>
 
-</RelativeLayout>
+</LinearLayout>

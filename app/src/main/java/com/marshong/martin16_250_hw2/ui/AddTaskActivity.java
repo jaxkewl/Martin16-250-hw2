@@ -1,7 +1,10 @@
 package com.marshong.martin16_250_hw2.ui;
 
+import android.content.ContentValues;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -9,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.marshong.martin16_250_hw2.R;
+import com.marshong.martin16_250_hw2.data.TasksContract;
 
 
 public class AddTaskActivity extends ActionBarActivity {
@@ -23,9 +27,9 @@ public class AddTaskActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
-        mEditTextTaskName = (EditText)findViewById(R.id.editTextTaskName);
-        mEditTextTaskDesc = (EditText)findViewById(R.id.editTextTaskDesc);
-        Button buttonOk = (Button)findViewById(R.id.buttonOk);
+        mEditTextTaskName = (EditText) findViewById(R.id.editTextTaskName);
+        mEditTextTaskDesc = (EditText) findViewById(R.id.editTextTaskDesc);
+        Button buttonOk = (Button) findViewById(R.id.buttonOk);
 
         buttonOk.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,10 +40,39 @@ public class AddTaskActivity extends ActionBarActivity {
     }
 
     private void insertTaskToDb() {
+        //Note: inserting values has nothing to do with using the cursor loader. we need to use
+        //the ContentResolver for CRUD, Create/Update/Delete
 
-/*        TaskDbHelper taskDbHelper = new TaskDbHelper(this);
-        taskDbHelper.addTask(getInput(mEditTextTaskName), getInput(mEditTextTaskDesc));
-        finish(); // go back to main screen*/
+        String taskName = mEditTextTaskName.getText().toString();
+        String taskDesc = mEditTextTaskDesc.getText().toString();
+        boolean validTask = true;
+
+        if (0 == taskName.trim().length()) {
+            mEditTextTaskName.setError("Enter a valid Task Name");
+            validTask = false;
+        }
+
+        if (0 == taskDesc.trim().length()) {
+            mEditTextTaskDesc.setError("Enter a valid Task Description");
+            validTask = false;
+        }
+
+        if (validTask) {
+            Log.d(TAG, "Adding a task: " + taskName + " " + taskDesc);
+
+            //Note: TaskProvider needs a URI and ContentValues as parameters.
+
+            //First, create ContentValues to add data
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(TasksContract.Task.TASK_NAME, taskName);
+            contentValues.put(TasksContract.Task.TASK_DESC, taskDesc);
+
+            //Second, get the URI to insert a task
+            getContentResolver().insert(TasksContract.Task.CONTENT_URI, contentValues);
+
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -66,6 +99,7 @@ public class AddTaskActivity extends ActionBarActivity {
 
     /**
      * Get the user input in EditText
+     *
      * @param editText
      * @return
      */

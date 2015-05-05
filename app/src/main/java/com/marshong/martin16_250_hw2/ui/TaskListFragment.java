@@ -10,12 +10,14 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -44,7 +46,57 @@ public class TaskListFragment extends ListFragment implements LoaderManager.Load
 
     private SimpleCursorAdapter mAdapter;
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        //Toast.makeText(getActivity(), "onViewCreated...", Toast.LENGTH_LONG).show();
+        Log.d(TAG, "onViewCreated...");
+        super.onViewCreated(view, savedInstanceState);
+
+        //GOTCHA: make sure to set choice mode multiple after the view is created
+        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+
+
+
+        getListView().setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                Log.d(TAG,"onItemCheckedStateChanged...");
+
+                // get the total # of checked items
+                final int checkedCount = getListView().getCheckedItemCount();
+
+                //set the title that will appear on the context bar
+                mode.setTitle(checkedCount + " Selected");
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+
+            }
+        });
+
+    }
+
+
     private void init(View rootView) {
+        Log.d(TAG, "init...");
+        //Toast.makeText(getActivity(), "init...", Toast.LENGTH_LONG).show();
         String[] fromFields = new String[]{TasksContract.Task.TASK_NAME};
         int[] toFields = new int[]{android.R.id.text1};
 
@@ -52,7 +104,8 @@ public class TaskListFragment extends ListFragment implements LoaderManager.Load
 
         mAdapter = new SimpleCursorAdapter(
                 getActivity(),
-                android.R.layout.simple_expandable_list_item_1,
+                //android.R.layout.simple_expandable_list_item_1,
+                android.R.layout.simple_list_item_multiple_choice,
                 null,
                 fromFields,
                 toFields,
@@ -60,6 +113,7 @@ public class TaskListFragment extends ListFragment implements LoaderManager.Load
         );
 
         setListAdapter(mAdapter);
+
     }
 
 /*    private void initOld(View rootView) {
@@ -127,6 +181,16 @@ public class TaskListFragment extends ListFragment implements LoaderManager.Load
                 startActivity(intent);
                 break;
             case R.id.action_delete:
+
+                Toast.makeText(getActivity(),"Delete is implemented from the Details View",Toast.LENGTH_SHORT).show();
+
+                /*Intent delIntent = new Intent(getActivity(), DeleteTaskActivity.class);
+                startActivity(delIntent);*/
+
+
+                //getListView().getCheckedItemPositions()
+
+
                 // Delete single task
 /*                int position = mListViewTasks.getCheckedItemPosition();
                 Task task = mTaskArrayAdapter.getItem(position);
@@ -180,6 +244,7 @@ public class TaskListFragment extends ListFragment implements LoaderManager.Load
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);    //GOTCHA: this needs to be set to true so the fragment's onCreateOptionsMenu will be called
+
     }
 
 
@@ -238,13 +303,17 @@ public class TaskListFragment extends ListFragment implements LoaderManager.Load
         }
     };
 
+
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        Log.d(TAG, "onListItemClick: " + position);
+        Log.d(TAG, "onListItemClick: " + position + ", id: " + id);
         super.onListItemClick(l, v, position, id);
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onTaskListSelected(Integer.toString(position));
+        //Note: convert long to int is ok here, because more than like we will not have more than
+        //~2 billion task IDs.
+        mCallbacks.onTaskListSelected(Integer.toString((int) id));
     }
 }

@@ -61,6 +61,8 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
         mListViewTasks.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
     }
 */
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,9 +114,9 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
     }
 
 
-    /*This is the callback method that this hostig activity needs to be responsible for.
+    /*This is the callback method that this hosting activity needs to be responsible for.
     The fragment passes the responsibility to this Activity via the Callback interface this
-    activity implmented.*/
+    activity implemented.*/
     @Override
     public void onTaskListSelected(String id) {
         Log.d(TAG, "onTaskListSelected: " + id);
@@ -138,6 +140,11 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
             //which is different than the way we are passing extras for single pane.
             Bundle bundle = new Bundle();
             bundle.putString(TaskDetailFragment.TASK_ID, id);
+
+            Uri uri = Uri.parse(TasksContract.Task.CONTENT_URI + "/" + id);
+            Log.d(TAG, "putting bundle: " + uri);
+            bundle.putParcelable("uri", uri);
+
             TaskDetailFragment detailFragment = new TaskDetailFragment();
             detailFragment.setArguments(bundle);
 
@@ -232,10 +239,17 @@ Content Provider
 5. TaskProvider created in 4, holds a DBHelper field to be used.
 6. The CP will provide the uriMatcher which contains the URI needed to access the information.
 7. The DB Helper class should only have onCreate and onUpgrade methods.
-
+8. You must register an observer in the query method in the ContentProvider so when changes are made to the
+   underlying DB using a ContentResolver, you can notify the ContentProvider that data has changed, to requery.
 
 Cursor Loader
-1.
+1. CursorLoader is only used to query the ContentProvider using a ContentResolver. You can not use a
+   CursorLoader to insert or delete. You must use a ContentResolver.
+2. Implement, onCreateLoader, onLoadFinished, and onLoaderReset
+
+ContentResolver.
+1. This class is used to insert or delete from the DB.
+2. call getContentResolver.insert, update, or delete.
 
 
 */

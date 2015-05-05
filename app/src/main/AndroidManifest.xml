@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.marshong.martin16_250_hw2" >
+    package="com.marshong.martin16_250_hw2">
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".ui.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -18,23 +18,27 @@
         </activity>
         <activity
             android:name=".ui.AddTaskActivity"
-            android:label="@string/title_activity_add_task"
+            android:label="@string/app_name"
             android:parentActivityName=".ui.MainActivity"
-            android:windowSoftInputMode="adjustResize" >
-        </activity>
+            android:windowSoftInputMode="adjustResize"></activity>
         <activity
             android:name=".ui.TaskDetail"
-            android:label="@string/title_activity_task_detail"
-            android:parentActivityName=".ui.MainActivity" >
+            android:label="@string/app_name"
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity" />
         </activity>
-        <!--The path to the provider-->
+        <!-- The path to the provider -->
         <provider
             android:name=".data.TaskProvider"
             android:authorities="com.marshong.martin16_250_hw2"
             android:exported="false" />
+        <!-- GOTCHA:set exported to false, otherwise, your content provider is accessible by other apps by default -->
+        <activity
+            android:name=".ui.DeleteTaskActivity"
+            android:label="@string/app_name"
+            android:parentActivityName=".ui.MainActivity"></activity>
     </application>
 
 </manifest>
