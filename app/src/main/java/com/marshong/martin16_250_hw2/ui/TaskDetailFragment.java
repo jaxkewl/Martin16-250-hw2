@@ -24,23 +24,16 @@ public class TaskDetailFragment extends Fragment {
 
     private final static String TAG = TaskDetailFragment.class.getSimpleName();
 
+    //this holds the primary key of the Task we have selected.
     public static final String TASK_ID = "TASK_ID";
 
+    //holds oure view objects so we can output the task and task description
     private TextView mTextViewTaskName;
     private TextView mTextViewTaskDescr;
 
-    //the following fields are from the DB and the DB object type
-/*    private TaskDbHelper mDbHelper;
-    private List<Task> mTasks;
-    private String mTaskID;
-    private Task mTask;*/
-
-
     private Uri mUri;
-    private String version;
     private String mTaskName;
     private String mTaskDescr;
-
     private String mId;
 
     public TaskDetailFragment() {
@@ -48,35 +41,26 @@ public class TaskDetailFragment extends Fragment {
     }
 
 
-/*    *//*this method handles getting the arguments when the "extras are attached to the fragments"*//*
-    private int getTaskId() {
-
-        if (getArguments().containsKey(TASK_ID)) {
-            String stringTaskID = getArguments().getString(TASK_ID);
-            return Integer.parseInt(stringTaskID);
-        }
-
-        return -1;
-    }*/
-
-
     //use this method to get the bundle and convert that to a task
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate called, setting up dbHelper...");
-        setHasOptionsMenu(true);
-
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);    //set this to true so the onOptionsItemSelected can be called for this fragment
+
+        //get the content URI and the primary key from the bundle
         Bundle bundle = getArguments();
         if (null != bundle) {
             mUri = bundle.getParcelable("uri"); // get URI
         }
         mId = bundle.getString(TaskDetailFragment.TASK_ID);
         Log.d(TAG, "Retrieved ID: " + mId);
-
         Log.d(TAG, "Retrieved URI: " + mUri);
 
+
+        //use a content receiver to query the DB, we could have used a cursor loader here
+        //but since we are only getting 1 item, and for sake of showing variety, we used a CR instead of CL.
         Cursor c = getActivity().getContentResolver().query(mUri,
                 TasksContract.Task.PROJECTION,
                 null,
@@ -90,50 +74,17 @@ public class TaskDetailFragment extends Fragment {
         //close the cursor
         c.close();
 
+        //just some logging and outputting to the screen
         Log.d(TAG, "found task: " + mTaskName + " " + mTaskDescr);
-        //}
-
         Toast.makeText(getActivity(), "Retrieved from Bundle or Args: " + mTaskName, Toast.LENGTH_SHORT).show();
-
     }
-
-/*    //use this method to get the bundle and convert that to a task
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate called, setting up dbHelper...");
-
-        super.onCreate(savedInstanceState);
-
-        //setup the DB Helper and get all the tasks stored in the DB
-        //then get the ID of which task was selected from the extras
-        mDbHelper = new TaskDbHelper(getActivity());
-        //mTasks = mDbHelper.getTasks();
-
-        //UUID uTaskID = (UUID)getActivity().getIntent().getSerializableExtra(TASK_ID);
-
-        mTaskID = getActivity().getIntent().getStringExtra(TASK_ID);
-        Bundle bundle = getArguments();
-
-        //if (getArguments().containsKey(TASK_ID)) {
-        //    mTaskID = getArguments().getString(TASK_ID);
-        if (null != mTaskID) {
-            int taskID = Integer.parseInt(mTaskID);
-            mTask = mTasks.get(taskID);
-        } else if (getArguments().containsKey(TASK_ID)) {
-            mTaskID = getArguments().getString(TASK_ID);
-            mTask = mTasks.get(Integer.parseInt(mTaskID));
-        }
-        Log.d(TAG, "found task: " + mTask);
-        //}
-
-        Toast.makeText(getActivity(),"Retrieved from Bundle or Args: " + mTask,Toast.LENGTH_SHORT).show();
-
-    }*/
 
     //to make the code easier to read, do all the initial setup in here
     //i.e. setting up widgets
     private void init(View rootView) {
         Log.d(TAG, "init() called, setting up view widgets");
+
+        //setting up the views
         mTextViewTaskDescr = (TextView) rootView.findViewById(R.id.fragment_detail_task_descr);
         mTextViewTaskName = (TextView) rootView.findViewById(R.id.fragment_detail_task_name);
 
@@ -149,11 +100,13 @@ public class TaskDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_task_detail, container, false);
-        init(rootView);
+
+        init(rootView); //separate method for readability
 
         return rootView;
     }
 
+    //use the table's primary key for reference
     private void deleteTask(String id) {
         Log.d(TAG, "Deleting a task: " + id);
 
@@ -176,15 +129,12 @@ public class TaskDetailFragment extends Fragment {
         switch (item.getItemId()) {
 
             case R.id.action_delete:
-                //delete this task
+                //delete this task using the primary key
                 deleteTask(mId);
 
                 Toast.makeText(getActivity(), "Task " + mTaskName + " deleted, ID:" + mId, Toast.LENGTH_SHORT).show();
                 break;
-
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 }

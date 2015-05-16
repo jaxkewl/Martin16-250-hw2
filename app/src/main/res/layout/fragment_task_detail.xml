@@ -3,11 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
+    android:gravity="center_horizontal"
     tools:context="com.marshong.martin16_250_hw2.ui.TaskDetailFragment">
 
     <TextView
+
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        android:paddingTop="30dp"
         android:paddingBottom="30dp"
         android:id="@+id/fragment_detail_task_name"
         android:layout_width="wrap_content"
@@ -18,9 +20,10 @@
     <TextView
         android:id="@+id/fragment_detail_task_descr"
         android:background="@drawable/text_border2"
-        android:padding="5dp"
+        android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:lines="5"
         android:textIsSelectable="true"
         android:text="@string/hello_blank_fragment" />
 

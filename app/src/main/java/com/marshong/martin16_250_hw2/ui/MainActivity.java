@@ -9,16 +9,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.marshong.martin16_250_hw2.R;
-import com.marshong.martin16_250_hw2.data.TaskDbHelper;
 import com.marshong.martin16_250_hw2.data.TasksContract;
-import com.marshong.martin16_250_hw2.model.Task;
-
-import java.util.List;
 
 
 /**
@@ -34,34 +27,11 @@ import java.util.List;
  * 4. The ListView is set to select multiple choices or a single choice (code commented out)
  * 5. Click on Delete to delete the selected task(s)
  */
-public class MainActivity extends ActionBarActivity implements TaskListFragment.Callbacks {
+public class MainActivity extends ActionBarActivity implements TaskListFragment.Callbacks { //Callbacks is used for Master/Detail fucntionality, letting the hosting activity take care of list item clicks
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
-    private TaskDbHelper mTaskDbHelper;
-    private ListView mListViewTasks;
-    private ArrayAdapter<Task> mTaskArrayAdapter;
-    private List<Task> tasks;
-
-    private boolean mTwoPaneMode = false;
-
-    /*private void oldWay() {
-        // Get task list data from DB
-        mTaskDbHelper = new TaskDbHelper(this);
-        tasks = mTaskDbHelper.getTasks();
-
-        // Set up UI ListView
-        mListViewTasks = (ListView) findViewById(R.id.listViewTasks);
-        mTaskArrayAdapter = new ArrayAdapter<Task>(this,  // context
-                android.R.layout.simple_list_item_multiple_choice,                 // UI layout for the list item, multiple choices
-//                android.R.layout.simple_list_item_single_choice,                     // UI layout for the list item, single choice
-                tasks);                                                              // objects
-        mListViewTasks.setAdapter(mTaskArrayAdapter);
-//        mListViewTasks.setChoiceMode(ListView.CHOICE_MODE_SINGLE);                // Use this for single choice
-        mListViewTasks.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-    }
-*/
-
+    private boolean mTwoPaneMode = false;   //class variable that gets set onCreate.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +52,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
             mTwoPaneMode = true;
         }
 
-        //all this MainActivity is doing is calling up the fragment manager
+        //all this method is doing is calling up the fragment manager
         //to start up the fragment to handle the task list
         FragmentManager fm = getFragmentManager();
         Fragment tlFragment = fm.findFragmentById(R.id.task_list_fragment_container);
@@ -95,7 +65,6 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
     @Override
     protected void onResume() {
         super.onResume();
-        //refreshUI();
     }
 
     @Override
@@ -116,7 +85,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
 
     /*This is the callback method that this hosting activity needs to be responsible for.
     The fragment passes the responsibility to this Activity via the Callback interface this
-    activity implemented.*/
+    activity implemented. Used in master/detail list implementation*/
     @Override
     public void onTaskListSelected(String id) {
         Log.d(TAG, "onTaskListSelected: " + id);
@@ -136,8 +105,9 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
             //Note: we are not starting a new activity, just simply replacing a fragment container
             //with a new fragment.
 
-            //in dual pane mode, we are attaching the bundle as part of the fragment's argument,
-            //which is different than the way we are passing extras for single pane.
+            //in dual pane mode, we are attaching a bundle as part of the fragment's argument,
+            //which is different than the way we are passing extras for single pane. I am doing it this way
+            //to show variety.
             Bundle bundle = new Bundle();
             bundle.putString(TaskDetailFragment.TASK_ID, id);
 
@@ -148,26 +118,26 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
             TaskDetailFragment detailFragment = new TaskDetailFragment();
             detailFragment.setArguments(bundle);
 
-            Toast.makeText(this, "Selected Task: " + id, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Selected Task: " + id, Toast.LENGTH_SHORT).show();
 
+            //since the sw600_layout_task_detail exists, we can replace that with whatever the detailFragment says to replace it with
             getFragmentManager().beginTransaction().replace(R.id.sw600_layout_task_detail, detailFragment).commit();
-
 
         } else {
             //single pane mode
-            //simply start a new activity, the way we always done, bundling in the ID of what was selected
+            //simply start a new activity, the way we always done, adding in the ID of what was selected
 
             Log.d(TAG, "Single Pane Mode...");
 
             //GOTCHA: we are attaching the task_id as part of the intent, which is different than
-            //the way we are handling it for dual pane mode
+            //the way we are handling it for dual pane mode. It is part of the intent, not a part of the fragment.
             Intent intent = new Intent(MainActivity.this, TaskDetail.class);
             intent.putExtra(TaskDetailFragment.TASK_ID, id);
 
 
             //Note: create a URI with the ID of which task was selected and pass it to the TaskDetail activity.
             //      In the TaskDetail activity, we will retrieve the uri extra and create a bundle so it can be
-            //      set in the fragments argument. Just a different way of doing it like the way it's done in
+            //      set in the fragments argument. Just a different way of doing it like the different way it's done in
             //      dual pane mode above.
             Uri uri = Uri.parse(TasksContract.Task.CONTENT_URI + "/" + id);
             Log.d(TAG, "putting extra: " + uri);
@@ -193,21 +163,23 @@ To create a fragment
 2. Instantiate the fragment java file, i.e. a file that extends Fragment or ListFragment
 3. Use fragment manager to add or replace the fragment created in 1 and 2.
 4. To pass information to fragments, create a bundle, and call setArguments.
-5. To pass information to activities, call putExtra
-    a. Doing it this way, to access the Extra information from a fragment you need to call up to the Activity and then the intent.
-6. To call the options menu from the fragment, you need to set this setHasOptionsMenu(true)
-    a. That way, the fragment can handle onCreateOptionsMenu and onOptionsItemSelected
+5. To pass information to activities using intents, call putExtra
+    a. Doing it this way, to access the Extra information from an intent you need to call up to the Activity and then the intent.
+6. To call the options menu from the fragment, you need to set this "setHasOptionsMenu(true)"
+    a. That way, the fragment can handle onCreateOptionsMenu and onOptionsItemSelected and not let the hosting activity handle it
 7. onCreateView is the only method to implement if you want bare minimum for fragments
+8. onViewCreated can be used after all the view components have been created
 
 
 Master/Detail List
 
 1. Create a fragment that extends ListFragment
-2. Need to implement minimum of 2 methods and 2 interface, onAttach, onDetach, and a Callback interface
+2. Need to implement 2 methods and 1 interface, onAttach, onDetach, and a Callback interface
     a. In the Callbacks interface, create spec onTaskListSelected which is to be implemented by the hosting activity
+    b. we are simply defining an interface defined within this fragment that was created in 1.
 3. In the hosting activity, implement the interface defined in the ListFragment created in 1.
     a. Implement the method, onTaskListSelected, since this hosting activity will handle user clicks to determine which task was selected.
-4. In the ListFragment class, implement onListItemClick, this is the method that calls Callback, passing in the ID of what was clicked.
+4. In the ListFragment class, implement onListItemClick, this is the method that calls Callback, passing in the ID (primary key) of what was clicked.
 
 
 
@@ -218,9 +190,9 @@ Split Pane
     b. The second FrameLayout (Detail) should have ID similar to the fragment container fo the single pane Detail FrameLayout.
 3. In the hosting activity, we need to determine if we are in two pane mode, by checking if either the IDs from 2 exist in R.id
     a. set a boolean if we are in two pane mode, so the entire class knows.
-4. Regardless if we are in single or dual pane, the List Fragment container should be populated using Fragment Manager (same old way), since we used the same name from 2, its abstracted for us.
+4. Regardless if we are in single or dual pane, the List Fragment container should be populated using Fragment Manager (same old way), since we used the same name from 2, it's abstracted for us.
 5. In the callbacks method, from the master/detail list, we need to populate the correct layout depending if we are in two pane mode.
-    a. if in single pane mode, start a new activity using the detail fragment container.
+    a. if in single pane mode, start a new activity using the detail fragment container. Same old way
     b. if in dual pane, we don't start a new activity since we are already in the activity hosting two fragments, we just need to replace the detail fragment with new information.
        Use getFragmentManager().beginTransaction().replace to replace the detail fragment container with the new info.
 
@@ -229,7 +201,7 @@ Split Pane
 Content Provider
 1. The ContentProvider must be registered in the manifest. This name must match the name defined in the Contract.
 2. All accessing of the database will be handled via a wrapper class called a Content Provider.
-    a. Content Resolver or Cursor Loader allows you to access data from a ContentProvider
+    a. Content Resolver and Cursor Loader allows you to access data from a ContentProvider asynchronously
     b. The ContentResolver does not directly invoke the ContentProviders query method directly.
        The CR's query method is invoked, which parses the URI, determines which CP to invoke, and
        then calls the CP's query method.
@@ -240,16 +212,40 @@ Content Provider
 6. The CP will provide the uriMatcher which contains the URI needed to access the information.
 7. The DB Helper class should only have onCreate and onUpgrade methods.
 8. You must register an observer in the query method in the ContentProvider so when changes are made to the
-   underlying DB using a ContentResolver, you can notify the ContentProvider that data has changed, to requery.
+   underlying DB using a ContentResolver, you can notify the ContentProvider that data has changed to requery.
+    a. cursor.setNotificationUri
+9. We marry the availability of the ContentProvider to the request of the CursorLoader using URIs. The CP advertises
+   the URI when the CP gets instantiated, sUriMatcher. The CursorLoader uses AndroidContract.Version.CONTENT_URI,
+   in the onCreateLoader method in TaskListFragment to call a specific URI to get a specific service.
+
 
 Cursor Loader
 1. CursorLoader is only used to query the ContentProvider using a ContentResolver. You can not use a
    CursorLoader to insert or delete. You must use a ContentResolver.
 2. Implement, onCreateLoader, onLoadFinished, and onLoaderReset
 
+
 ContentResolver.
 1. This class is used to insert or delete from the DB.
 2. call getContentResolver.insert, update, or delete.
+3. when calling getContentResolver.insert(), it needs, as an argument, the Content URI to know where to insert or delete.
+   a. Create ContentValues object to hold what you want to insert.
+
+Loaders:
+-There are 3 types of built in loaders. Loader, AsyncTaskLoader, CursorLoader.
+-Loader is the base class and not very useful on its owns. It defines the API
+that the LoaderManager uses to communicate with all loaders.
+-All communication with loaders is handled by the LoaderManager, hence Loaders
+retains their existing cursor data across the activity instance. (for example when
+it is restarted due to a configuration change i.e. rotation), thus saving the cursor from re-queries
+-A LoaderManager is responsible for managing one or more Loaders associated with an Activity or Fragment
+-The LoaderManager manages the CursorLoader across the Activity lifecycle using LoaderCallbacks interface, which
+need 3 methods implemented. onCreateLoader, onLoadFinished, onLoaderReset
+
+
+
+
+
 
 
 */

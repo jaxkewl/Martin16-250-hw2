@@ -10,147 +10,87 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import com.marshong.martin16_250_hw2.R;
-import com.marshong.martin16_250_hw2.data.TaskDbHelper;
 import com.marshong.martin16_250_hw2.data.TasksContract;
-import com.marshong.martin16_250_hw2.model.Task;
-
-import java.util.List;
 
 /**
  * Created by martin on 4/28/2015.
  */
-public class TaskListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class TaskListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> { //LoaderCallbacks inteface is a simple contract the the LoaderManager uses to report data back to the client, implement the 3 required methods below.
 
     private final static String TAG = TaskListFragment.class.getSimpleName();
 
-    private TaskDbHelper mTaskDbHelper;
-    private ListView mListViewTasks;
-    private ArrayAdapter<Task> mTaskArrayAdapter;
-    private List<Task> tasks;
+    // The loader's unique id. Loader ids are specific to the Activity or
+    // Fragment in which they reside.
+    private final static int LOADER_ID = 0;
 
+    //the fragment's current callback object, which is notified of list item clicks. used in Master/Detail implementation.
+    //different than the callback this class implements.
     private Callbacks mCallbacks = sDummyCallbacks;
+
+    // --------------------------
+    //tablet only field variables
+    // --------------------------
+    //The serialization (saved instance state) Bundle key representing the
+    //activated item position. Only used on tablets.
+    private static final String STATE_ACTIVATED_POSITION = "activated_position";
+
+    //The current activated item position. Only used on tablets.
+    private int mActivatedPosition = ListView.INVALID_POSITION;
+
 
     private SimpleCursorAdapter mAdapter;
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        //Toast.makeText(getActivity(), "onViewCreated...", Toast.LENGTH_LONG).show();
-        Log.d(TAG, "onViewCreated...");
-        super.onViewCreated(view, savedInstanceState);
-
-        //GOTCHA: make sure to set choice mode multiple after the view is created
-        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-
-
-
-
-        getListView().setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                Log.d(TAG,"onItemCheckedStateChanged...");
-
-                // get the total # of checked items
-                final int checkedCount = getListView().getCheckedItemCount();
-
-                //set the title that will appear on the context bar
-                mode.setTitle(checkedCount + " Selected");
-            }
-
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-
-            }
-        });
-
-    }
-
-
+    //for readability, put all initial actions in here, which is called from onCreateView.
     private void init(View rootView) {
         Log.d(TAG, "init...");
-        //Toast.makeText(getActivity(), "init...", Toast.LENGTH_LONG).show();
-        String[] fromFields = new String[]{TasksContract.Task.TASK_NAME};
-        int[] toFields = new int[]{android.R.id.text1};
+        String[] fromFields = new String[]{TasksContract.Task.TASK_NAME};   //name of the table column
 
-        getLoaderManager().initLoader(0, null, this);
+        //Note: to use your own custom layout, the toFields, must be pointing to the name of the
+        //ID in of your text view in the custom layout.
+        //int[] toFields = new int[]{R.id.textViewPrettyList};
+        int[] toFields = new int[]{R.id.textViewTaskNameFancyList}; //points to a view, inside of a layout.xml
+
+        //the loader manager is an abstract class that is associated with an activity or fragment for
+        //managing loader instances.
+
+        // "this" (the last argument used in initLoader) is the Activity
+        // (which implements the LoaderCallbacks<Cursor>
+        // interface) is the callbacks object through which we will interact
+        // with the LoaderManager. The LoaderManager uses this object to
+        // instantiate the Loader and to notify the client when data is made
+        // available/unavailable.
+        getLoaderManager().initLoader(LOADER_ID, null, this);
 
         mAdapter = new SimpleCursorAdapter(
                 getActivity(),
                 //android.R.layout.simple_expandable_list_item_1,
-                android.R.layout.simple_list_item_multiple_choice,
+                //android.R.layout.simple_list_item_multiple_choice,
+                R.layout.fancy_list_item,  //Note: use your own custom layout here.
                 null,
                 fromFields,
                 toFields,
                 0
         );
-
         setListAdapter(mAdapter);
-
     }
-
-/*    private void initOld(View rootView) {
-        // Get task list data from DB
-        mTaskDbHelper = new TaskDbHelper(getActivity());
-        tasks = mTaskDbHelper.getTasks();
-
-        setListAdapter(new ArrayAdapter<Task>(
-                getActivity(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                tasks));
-    }*/
-
-/*    private void initOld(View rootView) {
-        // Get task list data from DB
-        mTaskDbHelper = new TaskDbHelper(getActivity());
-        tasks = mTaskDbHelper.getTasks();
-
-        // Set up UI ListView
-        mListViewTasks = (ListView) rootView.findViewById(R.id.listView);
-        mTaskArrayAdapter = new ArrayAdapter<Task>(getActivity(),  // context
-                android.R.layout.simple_list_item_multiple_choice,                 // UI layout for the list item, multiple choices
-//                android.R.layout.simple_list_item_single_choice,                     // UI layout for the list item, single choice
-                tasks);                                                              // objects
-        mListViewTasks.setAdapter(mTaskArrayAdapter);
-//        mListViewTasks.setChoiceMode(ListView.CHOICE_MODE_SINGLE);                // Use this for single choice
-        mListViewTasks.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-    }*/
-
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_task_list, container, false);
 
-
+        //for readability call this method.
         init(rootView);
 
         return rootView;
@@ -169,7 +109,7 @@ public class TaskListFragment extends ListFragment implements LoaderManager.Load
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.d(TAG, "TaskListFragment onOptionsItemSelected");
 
-// Handle action bar item clicks here. The action bar will
+        // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
@@ -181,57 +121,12 @@ public class TaskListFragment extends ListFragment implements LoaderManager.Load
                 startActivity(intent);
                 break;
             case R.id.action_delete:
-
-                Toast.makeText(getActivity(),"Delete is implemented from the Details View",Toast.LENGTH_SHORT).show();
-
-                /*Intent delIntent = new Intent(getActivity(), DeleteTaskActivity.class);
-                startActivity(delIntent);*/
-
-
-                //getListView().getCheckedItemPositions()
-
-
-                // Delete single task
-/*                int position = mListViewTasks.getCheckedItemPosition();
-                Task task = mTaskArrayAdapter.getItem(position);
-                deleteSingleTask(position, task.getId());*/
-
-                // Delete multiple tasks
-/*                ArrayList<Integer> ids = new ArrayList<Integer>();
-                SparseBooleanArray checkedItems = mListViewTasks.getCheckedItemPositions();
-                if (checkedItems.size() > 0) {
-                    for (int i = 0; i < checkedItems.size(); i++) {
-                        int position = checkedItems.keyAt(i);
-                        Task task = mTaskArrayAdapter.getItem(position);
-                        ids.add((int) task.getId());
-                    }
-                    mTaskDbHelper.deleteTasks(ids);
-                }*/
-                //refreshUI();
+                Toast.makeText(getActivity(), "Delete is implemented from the Details View", Toast.LENGTH_SHORT).show();
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-
-    /**
-     * Delete a single task from db
-     *
-     * @param pos
-     * @param id
-     */
-
-    private void deleteSingleTask(int pos, long id) {
-
-/*        if (pos >= 0) {
-            int rowsDeleted = mTaskDbHelper.deleteTask(id);
-            if (rowsDeleted > 0) {
-                refreshUI();
-            }
-        }*/
-        Toast.makeText(getActivity(), "Item Deleted @position #" + pos + " rowId is #" + id, Toast.LENGTH_LONG).show();
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -249,26 +144,13 @@ public class TaskListFragment extends ListFragment implements LoaderManager.Load
 
 
 
-    /*The following 2 methods need to be overridden so the hosting activity can get a call back
-            to handle clicks and call the TaskDetailFragment*/
 
-    @Override
-    public void onAttach(Activity activity) {
-
-        super.onAttach(activity);
-
-        // Activities containing this fragment must implement its callbacks.
-        if (!(activity instanceof Callbacks)) {
-            throw new IllegalStateException("Activity must implement fragment's callbacks.");
-        }
-
-        mCallbacks = (Callbacks) activity;
-    }
-
-    /*The following methods are required by implementing LoaderManager.LoaderCallbacks<Cursor>*/
+    /*The following 3 methods are required by implementing LoaderManager.LoaderCallbacks<Cursor>*/
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        //Note: this is how you associate a cursor loader with the LoaderManager.
+        //Since this method is required, define your CursorLoader here.
         CursorLoader cursorLoader = new CursorLoader(getActivity(),
                 TasksContract.Task.CONTENT_URI,
                 TasksContract.Task.PROJECTION,
@@ -281,21 +163,70 @@ public class TaskListFragment extends ListFragment implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
+        // The asynchronous load is complete and the data
+        // is now available for use. Only now can we associate
+        // the queried Cursor with the SimpleCursorAdapter.
         mAdapter.swapCursor(data);
+
+
+        /*// A switch-case is useful when dealing with multiple Loaders/IDs
+        switch (loader.getId()) {
+            case LOADER_ID:
+                // The asynchronous load is complete and the data
+                // is now available for use. Only now can we associate
+                // the queried Cursor with the SimpleCursorAdapter.
+                mAdapter.swapCursor(cursor);
+                break;
+        }
+        // The listview now displays the queried data.*/
     }
 
     @Override
     public void onLoaderReset(android.content.Loader<Cursor> loader) {
+        // For whatever reason, the Loader's data is now unavailable.
+        // Remove any references to the old data by replacing it with
+        // a null Cursor.
         mAdapter.swapCursor(null);
     }
 
 
+
+    /*Master/Detail: The following 2 methods (onAttach, onDetach) need to be overridden so the hosting activity can get a call back
+            to handle clicks and call the TaskDetailFragment*/
+
+    @Override
+    public void onAttach(Activity activity) {
+
+        super.onAttach(activity);
+
+        // Activities containing this fragment must implement its callbacks.
+        if (!(activity instanceof Callbacks)) {
+            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+        }
+
+
+        mCallbacks = (Callbacks) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        // Reset the active callbacks interface to the dummy implementation.
+        mCallbacks = sDummyCallbacks;
+    }
+
     /*The following interface must be defined in this list fragment so the hosting activity can
-    implement the methods of this interface*/
+        implement the methods of this interface*/
     public interface Callbacks {
         void onTaskListSelected(String id);
     }
 
+    /**
+     * A dummy implementation of the {@link Callbacks} interface that does
+     * nothing. Used only when this fragment is not attached to an activity.
+     * Note: from the Sample Master/Detail and not from cursor loader sample.
+     */
     private static Callbacks sDummyCallbacks = new Callbacks() {
         @Override
         public void onTaskListSelected(String id) {
@@ -304,16 +235,15 @@ public class TaskListFragment extends ListFragment implements LoaderManager.Load
     };
 
 
-
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        Log.d(TAG, "onListItemClick: " + position + ", id: " + id);
+        Log.d(TAG, "onListItemClick: " + position + ", id: " + id); //position is position in the list. id is the primary key
         super.onListItemClick(l, v, position, id);
 
-        // Notify the active callbacks interface (the activity, if the
+        // Notify the active callbacks interface (the hosting activity, if the
         // fragment is attached to one) that an item has been selected.
-        //Note: convert long to int is ok here, because more than like we will not have more than
+        //Note: convert long to int is ok here, because more than likely we will not have more than
         //~2 billion task IDs.
-        mCallbacks.onTaskListSelected(Integer.toString((int) id));
+        mCallbacks.onTaskListSelected(Integer.toString((int) id));  //in our case MainActivity, the hosting activity will be responsible for handling this
     }
 }

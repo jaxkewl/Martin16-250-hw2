@@ -14,7 +14,7 @@ import android.util.Log;
 /**
  * Created by martin on 4/30/2015.
  */
-public class TaskProvider extends ContentProvider {
+public class TaskProvider extends ContentProvider {  // implement onCreate, query, getType, insert, delete, update
 
     private static final String TAG = TaskProvider.class.getSimpleName();
 

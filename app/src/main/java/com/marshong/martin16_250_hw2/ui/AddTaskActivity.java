@@ -39,9 +39,11 @@ public class AddTaskActivity extends ActionBarActivity {
         });
     }
 
+
+    //do some form validation  before attempting to insert into the database
     private void insertTaskToDb() {
         //Note: inserting values has nothing to do with using the cursor loader. we need to use
-        //the ContentResolver for CRUD, Create/Update/Delete
+        //the ContentResolver, Create/Update/Delete
 
         String taskName = mEditTextTaskName.getText().toString();
         String taskDesc = mEditTextTaskDesc.getText().toString();
@@ -78,7 +80,7 @@ public class AddTaskActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_add_task, menu);
+        //getMenuInflater().inflate(R.menu.menu_add_task, menu);
         return true;
     }
 
@@ -95,16 +97,6 @@ public class AddTaskActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Get the user input in EditText
-     *
-     * @param editText
-     * @return
-     */
-    private String getInput(EditText editText) {
-        return editText.getText().toString().trim();
     }
 
 }
